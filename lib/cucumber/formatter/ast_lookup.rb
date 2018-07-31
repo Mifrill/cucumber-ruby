@@ -12,7 +12,7 @@ module Cucumber
       end
 
       def on_gherkin_source_parsed(event)
-        @gherkin_documents[event.uri] = event.gherkin_document
+        @gherkin_documents[event.gherkin_document[:uri]] = event.gherkin_document
       end
 
       def gherkin_document(uri)
@@ -68,12 +68,15 @@ module Cucumber
         feature = gherkin_document[:feature]
         lookup_hash = {}
         feature[:children].each do |child|
-          if child[:type] == :Scenario
-            lookup_hash[child[:location][:line]] = ScenarioSource.new(:Scenario, child)
-          elsif child[:type] == :ScenarioOutline
-            child[:examples].each do |examples|
-              examples[:tableBody].each do |row|
-                lookup_hash[row[:location][:line]] = ScenarioOutlineSource.new(:ScenarioOutline, child, examples, row)
+          unless child[:scenario].nil?
+            if child[:scenario][:examples].empty?
+              lookup_hash[child[:scenario][:location][:line]] = ScenarioSource.new(:Scenario, child[:scenario])
+
+            else
+              child[:scenario][:examples].each do |examples|
+                examples[:table_body].each do |row|
+                  lookup_hash[row[:location][:line]] = ScenarioOutlineSource.new(:ScenarioOutline, child[:scenario], examples, row)
+                end
               end
             end
           end
@@ -85,8 +88,14 @@ module Cucumber
         feature = gherkin_document[:feature]
         lookup_hash = {}
         feature[:children].each do |child|
-          child[:steps].each do |step|
-            lookup_hash[step[:location][:line]] = StepSource.new(:Step, step)
+          if !child[:scenario].nil?
+            child[:scenario][:steps].each do |step|
+              lookup_hash[step[:location][:line]] = StepSource.new(:Step, step)
+            end
+          elsif !child[:background].nil?
+            child[:background][:steps].each do |step|
+              lookup_hash[step[:location][:line]] = StepSource.new(:Step, step)
+            end
           end
         end
         lookup_hash
@@ -99,12 +108,20 @@ module Cucumber
         original_previous_node = nil
         gherkin_document[:feature][:children].each do |child|
           previous_node = original_previous_node
-          child[:steps].each do |step|
-            node = KeywordSearchNode.new(step[:keyword], previous_node)
-            lookup[step[:location][:line]] = node
-            previous_node = node
+          if !child[:scenario].nil?
+            child[:scenario][:steps].each do |step|
+              node = KeywordSearchNode.new(step[:keyword], previous_node)
+              lookup[step[:location][:line]] = node
+              previous_node = node
+            end
+          elsif !child[:background].nil?
+            child[:background][:steps].each do |step|
+              node = KeywordSearchNode.new(step[:keyword], previous_node)
+              lookup[step[:location][:line]] = node
+              previous_node = node
+              original_previous_node = previous_node
+            end
           end
-          original_previous_node = previous_node if child[:type] == :Background
         end
         lookup
       end

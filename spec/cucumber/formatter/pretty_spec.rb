@@ -664,14 +664,14 @@ OUTPUT
             it 'outputs the instantiated scenarios' do
               lines = <<-OUTPUT
               Examples: Fruit
-                Scenario: | apples |
+                Example: | apples |
                   Given there are apples
-                Scenario: | bananas |
+                Example: | bananas |
                   Given there are bananas
               Examples: Vegetables
-                Scenario: | broccoli |
+                Example: | broccoli |
                   Given there are broccoli
-                Scenario: | carrots |
+                Example: | carrots |
                   Given there are carrots
               OUTPUT
               lines.split("\n").each do |line|
@@ -755,14 +755,14 @@ OUTPUT
               Scenario Outline: Monkey eats a balanced diet # spec.feature:3
                 Given there are <Things>                    # spec.feature:4
                 Examples: Fruit
-                  Scenario: | apples |     # spec.feature:8
+                  Example: | apples |      # spec.feature:8
                     Given there are apples # spec.feature:8
-                  Scenario: | bananas |     # spec.feature:9
+                  Example: | bananas |      # spec.feature:9
                     Given there are bananas # spec.feature:9
                 Examples: Vegetables
-                  Scenario: | broccoli |     # spec.feature:12
+                  Example: | broccoli |      # spec.feature:12
                     Given there are broccoli # spec.feature:12
-                  Scenario: | carrots |     # spec.feature:13
+                  Example: | carrots |      # spec.feature:13
                     Given there are carrots # spec.feature:13
               OUTPUT
               lines.split("\n").each do |line|
@@ -785,8 +785,8 @@ OUTPUT
               it 'the scenario line controls the source indentation' do
                 lines = <<-OUTPUT
               Examples:
-                 Scenario: | Hominidae | Very long cell content | # spec.feature:8
-                   Given there are Hominidae                      # spec.feature:8
+                 Example: | Hominidae | Very long cell content | # spec.feature:8
+                   Given there are Hominidae                     # spec.feature:8
 
                 OUTPUT
                 lines.split("\n").each do |line|

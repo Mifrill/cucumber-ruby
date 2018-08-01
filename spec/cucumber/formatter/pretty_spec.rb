@@ -455,6 +455,46 @@ Feature:
 OUTPUT
             end
           end
+
+          describe 'with the rule keyword' do
+            define_feature <<-FEATURE
+          Feature: Some rules
+
+            Background: FB
+              Given fb
+
+            Rule: A
+              The rule A description
+
+              Background: AB
+                Given ab
+
+              Example: Example A
+                Given a
+
+            Rule: B
+              The rule B description
+
+              Example: Example B
+                Given b
+            FEATURE
+
+            it 'ignores the rule keyword' do
+              expect(@out.string).to include <<OUTPUT
+Feature: Some rules
+
+  Background: FB
+    Given fb
+    Given ab
+
+  Example: Example A
+    Given a
+
+  Example: Example B
+    Given b
+OUTPUT
+            end
+          end
         end
       end
 

@@ -13,15 +13,8 @@ module Cucumber
 
       def parse(text)
         dialect = ::Gherkin::Dialect.for(@language)
-        parser = ::Gherkin::Gherkin.new(
-          [],       # do not pass paths
-          false,    # no source messages
-          true,     # ast messages
-          false,    # no pickles messages
-          @language # the default dialect
-        )
         gherkin_document = nil
-        messages = parser.parse('dummy', feature_header(dialect) + text)
+        messages = ::Gherkin::Gherkin.from_source('dummy', feature_header(dialect) + text, default_dialect: @language, include_source: false, include_pickles: false)
         messages.each do |message|
           gherkin_document = message.gherkinDocument.to_hash unless message.gherkinDocument.nil?
         end

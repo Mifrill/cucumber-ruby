@@ -11,14 +11,8 @@ module Cucumber
       end
 
       def parse(text)
-        parser = ::Gherkin::Gherkin.new(
-          [],    # do not pass paths
-          false, # no source messages
-          true,  # ast messages
-          false  # no pickles messages
-        )
         gherkin_document = nil
-        messages = parser.parse('dummy', feature_header + text)
+        messages = ::Gherkin::Gherkin.from_source('dummy', feature_header + text, include_source: false, include_pickles: false)
         messages.each do |message|
           gherkin_document = message.gherkinDocument.to_hash unless message.gherkinDocument.nil?
         end
